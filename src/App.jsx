@@ -1,63 +1,237 @@
+// src/App.jsx
+
 import { useState } from "react";
 import { products } from "./data/products";
 import "./App.css";
 
 function App() {
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
   const [cart, setCart] = useState([]);
 
+  // Add To Cart
+
   const addToCart = (product) => {
-    setCart([...cart, product]);
+    const existingItem = cart.find((item) => item.id === product.id);
+
+    if (existingItem) {
+      const updatedCart = cart.map((item) =>
+        item.id === product.id
+          ? {
+              ...item,
+              quantity: item.quantity + 1,
+            }
+          : item,
+      );
+
+      setCart(updatedCart);
+    } else {
+      setCart([
+        ...cart,
+        {
+          ...product,
+          quantity: 1,
+        },
+      ]);
+    }
   };
+
+  // Increase Quantity
+
+  const increaseQty = (productId) => {
+    const updatedCart = cart.map((item) =>
+      item.id === productId
+        ? {
+            ...item,
+            quantity: item.quantity + 1,
+          }
+        : item,
+    );
+
+    setCart(updatedCart);
+  };
+
+  // Decrease Quantity
+
+  const decreaseQty = (productId) => {
+    const updatedCart = cart
+      .map((item) =>
+        item.id === productId
+          ? {
+              ...item,
+              quantity: item.quantity - 1,
+            }
+          : item,
+      )
+      .filter((item) => item.quantity > 0);
+
+    setCart(updatedCart);
+  };
+
+  // Product Filtering
+
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchesCategory =
+      selectedCategory === "all" ? true : product.category === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
+
+  // Totals
+
+  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+
+  const totalAmount = cart.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
 
   return (
     <div className="app">
       {/* Header */}
+
       <header className="header">
         <h1>Mini Delivery App 🚚</h1>
       </header>
 
       {/* Search */}
+
       <div className="search-container">
         <input
           type="text"
           placeholder="Search products..."
           className="search-box"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
       {/* Categories */}
+
       <div className="categories">
-        <button>Milk</button>
-        <button>Fruits</button>
-        <button>Vegetables</button>
-        <button>Snacks</button>
-        <button>Rice</button>
+        <button onClick={() => setSelectedCategory("all")}>All</button>
+
+        <button onClick={() => setSelectedCategory("milk")}>Milk</button>
+
+        <button onClick={() => setSelectedCategory("fruits")}>Fruits</button>
+
+        <button onClick={() => setSelectedCategory("vegetables")}>
+          Vegetables
+        </button>
+
+        <button onClick={() => setSelectedCategory("snacks")}>Snacks</button>
+
+        <button onClick={() => setSelectedCategory("rice")}>Rice</button>
       </div>
 
       {/* Product Grid */}
+
       <div className="products-grid">
-        {products.map((product) => (
-          <div className="product-card" key={product.id}>
-            <img
-              src={product.image}
-              alt={product.name}
-              className="product-image"
-            />
+        {filteredProducts.map((product) => {
+          const cartItem = cart.find((item) => item.id === product.id);
 
-            <div className="product-info">
-              <h3>{product.name}</h3>
-              <p>₹{product.price}</p>
+          return (
+            <div className="product-card" key={product.id}>
+              <img
+                src={product.image}
+                alt={product.name}
+                className="product-image"
+              />
+
+              <div className="product-info">
+                <h3>{product.name}</h3>
+
+                <p>₹{product.price}</p>
+              </div>
+
+              {!cartItem ? (
+                <button className="add-btn" onClick={() => addToCart(product)}>
+                  Add
+                </button>
+              ) : (
+                <div className="qty-controls">
+                  <button
+                    className="qty-btn"
+                    onClick={() => decreaseQty(product.id)}
+                  >
+                    -
+                  </button>
+
+                  <span>{cartItem.quantity}</span>
+
+                  <button
+                    className="qty-btn"
+                    onClick={() => increaseQty(product.id)}
+                  >
+                    +
+                  </button>
+                </div>
+              )}
             </div>
-
-            <button className="add-btn" onClick={() => addToCart(product)}>
-              Add
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Floating Cart */}
-      <div className="floating-cart">🛒 {cart.length} items</div>
+      {/* Cart Section */}
+
+      <div className="cart-container">
+        <h2>🛒 Cart Summary ({totalItems} items)</h2>
+
+        {cart.length === 0 ? (
+          <p>Your cart is empty</p>
+        ) : (
+          <>
+            {cart.map((item) => (
+              <div className="cart-item" key={item.id}>
+                <div className="cart-left">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="cart-image"
+                  />
+
+                  <div>
+                    <h4>{item.name}</h4>
+
+                    <p>
+                      ₹{item.price} × {item.quantity}
+                    </p>
+
+                    <strong>₹{item.price * item.quantity}</strong>
+                  </div>
+                </div>
+
+                <div className="qty-controls">
+                  <button
+                    className="qty-btn"
+                    onClick={() => decreaseQty(item.id)}
+                  >
+                    -
+                  </button>
+
+                  <span>{item.quantity}</span>
+
+                  <button
+                    className="qty-btn"
+                    onClick={() => increaseQty(item.id)}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            <div className="cart-total">
+              <h2>Total Amount: ₹{totalAmount}</h2>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
