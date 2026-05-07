@@ -1,3 +1,5 @@
+// src/App.jsx
+
 import { useState } from "react";
 import { products } from "./data/products";
 import "./App.css";
@@ -73,7 +75,7 @@ function App() {
     setCart(updatedCart);
   };
 
-  // Filtering
+  // Product Filtering
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name
@@ -95,7 +97,7 @@ function App() {
     0,
   );
 
-  // Place Order
+  // WhatsApp Order
 
   const placeOrder = () => {
     if (!customerName || !phone || !address) {
@@ -108,14 +110,45 @@ function App() {
       return;
     }
 
-    alert(`Order placed successfully!\n\nThank you ${customerName}`);
+    // Order Items
 
-    // Reset
+    const orderItems = cart
+      .map(
+        (item) =>
+          `${item.name} x ${item.quantity} = ₹${item.price * item.quantity}`,
+      )
+      .join("\n");
 
-    setCart([]);
-    setCustomerName("");
-    setPhone("");
-    setAddress("");
+    // WhatsApp Message
+
+    const message = `🛒 New Order
+
+Customer Name: ${customerName}
+
+Phone: ${phone}
+
+Address:
+${address}
+
+------------------------
+
+${orderItems}
+
+------------------------
+
+Total Amount: ₹${totalAmount}
+
+Thank you 🚚`;
+
+    // Replace with YOUR WhatsApp number
+
+    const whatsappNumber = "919962761010";
+
+    // Open WhatsApp
+
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappURL, "_blank");
   };
 
   return (
@@ -156,7 +189,7 @@ function App() {
         <button onClick={() => setSelectedCategory("rice")}>Rice</button>
       </div>
 
-      {/* Products */}
+      {/* Product Grid */}
 
       <div className="products-grid">
         {filteredProducts.map((product) => {
@@ -204,7 +237,7 @@ function App() {
         })}
       </div>
 
-      {/* Cart */}
+      {/* Cart Section */}
 
       <div className="cart-container">
         <h2>🛒 Cart Summary ({totalItems} items)</h2>
@@ -289,7 +322,7 @@ function App() {
         />
 
         <button className="place-order-btn" onClick={placeOrder}>
-          Place Order
+          Place Order on WhatsApp
         </button>
       </div>
     </div>
