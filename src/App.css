@@ -1,4 +1,6 @@
-/* Global */
+/* =========================
+   GLOBAL
+========================= */
 
 * {
   margin: 0;
@@ -15,7 +17,9 @@ body {
   padding-bottom: 40px;
 }
 
-/* Header */
+/* =========================
+   HEADER
+========================= */
 
 .header {
   background: #2563eb;
@@ -29,11 +33,16 @@ body {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Search */
+/* =========================
+   SEARCH
+========================= */
 
 .search-container {
   padding: 12px;
   background: white;
+  position: sticky;
+  top: 58px;
+  z-index: 99;
 }
 
 .search-box {
@@ -49,7 +58,9 @@ body {
   border-color: #2563eb;
 }
 
-/* Categories */
+/* =========================
+   CATEGORIES
+========================= */
 
 .categories {
   display: flex;
@@ -58,6 +69,9 @@ body {
   padding: 10px 12px;
   background: white;
   scrollbar-width: none;
+  position: sticky;
+  top: 126px;
+  z-index: 98;
 }
 
 .categories::-webkit-scrollbar {
@@ -79,7 +93,9 @@ body {
   background: #d1d5db;
 }
 
-/* Products Grid */
+/* =========================
+   PRODUCTS GRID
+========================= */
 
 .products-grid {
   display: grid;
@@ -88,7 +104,9 @@ body {
   padding: 12px;
 }
 
-/* Product Card */
+/* =========================
+   PRODUCT CARD
+========================= */
 
 .product-card {
   background: white;
@@ -122,7 +140,9 @@ body {
   font-size: 15px;
 }
 
-/* Add Button */
+/* =========================
+   BUTTONS
+========================= */
 
 .add-btn {
   margin-top: 10px;
@@ -140,7 +160,9 @@ body {
   background: #1d4ed8;
 }
 
-/* Quantity Controls */
+/* =========================
+   QUANTITY
+========================= */
 
 .qty-controls {
   display: flex;
@@ -167,7 +189,9 @@ body {
   font-weight: bold;
 }
 
-/* Cart Section */
+/* =========================
+   CART
+========================= */
 
 .cart-container {
   background: white;
@@ -227,7 +251,29 @@ body {
   font-size: 18px;
 }
 
-/* Checkout */
+/* =========================
+   CLEAR CART
+========================= */
+
+.clear-cart-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.clear-cart-btn:hover {
+  background: #dc2626;
+}
+
+/* =========================
+   CHECKOUT
+========================= */
 
 .checkout-container {
   background: white;
@@ -282,7 +328,9 @@ body {
   background: #16a34a;
 }
 
-/* Desktop */
+/* =========================
+   DESKTOP
+========================= */
 
 @media (min-width: 768px) {
   .products-grid {
@@ -294,12 +342,29 @@ body {
   }
 }
 
-/* Mobile Optimization */
+/* =========================
+   MOBILE OPTIMIZATION
+========================= */
 
 @media (max-width: 480px) {
   .header {
     font-size: 16px;
     padding: 14px;
+  }
+
+  .search-container {
+    top: 52px;
+    padding: 10px;
+  }
+
+  .categories {
+    top: 112px;
+    padding: 10px;
+  }
+
+  .categories button {
+    font-size: 13px;
+    padding: 8px 14px;
   }
 
   .products-grid {
@@ -334,6 +399,10 @@ body {
     font-size: 16px;
   }
 
+  .qty-controls {
+    gap: 10px;
+  }
+
   .cart-container,
   .checkout-container {
     margin: 10px;
@@ -343,6 +412,16 @@ body {
   .cart-container h2,
   .checkout-container h2 {
     font-size: 20px;
+  }
+
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .cart-left {
+    width: 100%;
   }
 
   .cart-image {
@@ -359,5 +438,9 @@ body {
   .place-order-btn {
     font-size: 16px;
     padding: 15px;
+  }
+
+  .clear-cart-btn {
+    width: 100%;
   }
 }

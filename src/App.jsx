@@ -1,20 +1,75 @@
 // src/App.jsx
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { products } from "./data/products";
 import "./App.css";
 
 function App() {
+  // Search
+
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const [cart, setCart] = useState([]);
+  // Persist Category
 
-  const [customerName, setCustomerName] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    return localStorage.getItem("selectedCategory") || "all";
+  });
 
-  const [phone, setPhone] = useState("");
+  // Persist Cart
 
-  const [address, setAddress] = useState("");
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem("cart");
+
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  // Persist Customer Name
+
+  const [customerName, setCustomerName] = useState(() => {
+    return localStorage.getItem("customerName") || "";
+  });
+
+  // Persist Phone
+
+  const [phone, setPhone] = useState(() => {
+    return localStorage.getItem("phone") || "";
+  });
+
+  // Persist Address
+
+  const [address, setAddress] = useState(() => {
+    return localStorage.getItem("address") || "";
+  });
+
+  // Save Cart
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  // Save Category
+
+  useEffect(() => {
+    localStorage.setItem("selectedCategory", selectedCategory);
+  }, [selectedCategory]);
+
+  // Save Customer Name
+
+  useEffect(() => {
+    localStorage.setItem("customerName", customerName);
+  }, [customerName]);
+
+  // Save Phone
+
+  useEffect(() => {
+    localStorage.setItem("phone", phone);
+  }, [phone]);
+
+  // Save Address
+
+  useEffect(() => {
+    localStorage.setItem("address", address);
+  }, [address]);
 
   // Add To Cart
 
@@ -73,6 +128,20 @@ function App() {
       .filter((item) => item.quantity > 0);
 
     setCart(updatedCart);
+  };
+
+  // Clear Cart
+
+  const clearCart = () => {
+    const confirmClear = window.confirm(
+      "Are you sure you want to clear the cart?",
+    );
+
+    if (confirmClear) {
+      setCart([]);
+
+      localStorage.removeItem("cart");
+    }
   };
 
   // Product Filtering
@@ -140,13 +209,15 @@ Total Amount: ₹${totalAmount}
 
 Thank you 🚚`;
 
-    // Replace with YOUR WhatsApp number
+    // Replace With Your Number
 
-    const whatsappNumber = "919962761010";
+    const whatsappNumber = "919999999999";
 
-    // Open WhatsApp
+    // WhatsApp URL
 
-    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+      message,
+    )}`;
 
     window.open(whatsappURL, "_blank");
   };
@@ -189,7 +260,7 @@ Thank you 🚚`;
         <button onClick={() => setSelectedCategory("rice")}>Rice</button>
       </div>
 
-      {/* Product Grid */}
+      {/* Products */}
 
       <div className="products-grid">
         {filteredProducts.map((product) => {
@@ -237,10 +308,18 @@ Thank you 🚚`;
         })}
       </div>
 
-      {/* Cart Section */}
+      {/* Cart */}
 
       <div className="cart-container">
         <h2>🛒 Cart Summary ({totalItems} items)</h2>
+
+        {/* Clear Cart Button */}
+
+        {cart.length > 0 && (
+          <button className="clear-cart-btn" onClick={clearCart}>
+            Clear Cart
+          </button>
+        )}
 
         {cart.length === 0 ? (
           <p>Your cart is empty</p>
