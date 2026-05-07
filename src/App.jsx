@@ -1,5 +1,3 @@
-// src/App.jsx
-
 import { useState } from "react";
 import { products } from "./data/products";
 import "./App.css";
@@ -9,6 +7,12 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   const [cart, setCart] = useState([]);
+
+  const [customerName, setCustomerName] = useState("");
+
+  const [phone, setPhone] = useState("");
+
+  const [address, setAddress] = useState("");
 
   // Add To Cart
 
@@ -69,7 +73,7 @@ function App() {
     setCart(updatedCart);
   };
 
-  // Product Filtering
+  // Filtering
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name
@@ -90,6 +94,29 @@ function App() {
     (total, item) => total + item.price * item.quantity,
     0,
   );
+
+  // Place Order
+
+  const placeOrder = () => {
+    if (!customerName || !phone || !address) {
+      alert("Please fill all details");
+      return;
+    }
+
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+
+    alert(`Order placed successfully!\n\nThank you ${customerName}`);
+
+    // Reset
+
+    setCart([]);
+    setCustomerName("");
+    setPhone("");
+    setAddress("");
+  };
 
   return (
     <div className="app">
@@ -129,7 +156,7 @@ function App() {
         <button onClick={() => setSelectedCategory("rice")}>Rice</button>
       </div>
 
-      {/* Product Grid */}
+      {/* Products */}
 
       <div className="products-grid">
         {filteredProducts.map((product) => {
@@ -177,7 +204,7 @@ function App() {
         })}
       </div>
 
-      {/* Cart Section */}
+      {/* Cart */}
 
       <div className="cart-container">
         <h2>🛒 Cart Summary ({totalItems} items)</h2>
@@ -231,6 +258,39 @@ function App() {
             </div>
           </>
         )}
+      </div>
+
+      {/* Checkout */}
+
+      <div className="checkout-container">
+        <h2>📦 Checkout</h2>
+
+        <input
+          type="text"
+          placeholder="Customer Name"
+          value={customerName}
+          onChange={(e) => setCustomerName(e.target.value)}
+          className="checkout-input"
+        />
+
+        <input
+          type="text"
+          placeholder="Phone Number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className="checkout-input"
+        />
+
+        <textarea
+          placeholder="Delivery Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="checkout-textarea"
+        />
+
+        <button className="place-order-btn" onClick={placeOrder}>
+          Place Order
+        </button>
       </div>
     </div>
   );
