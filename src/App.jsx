@@ -9,6 +9,16 @@ function App() {
 
   const [search, setSearch] = useState("");
 
+  // Product Popup
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // Coupon
+
+  const [couponCode, setCouponCode] = useState("");
+
+  const [discount, setDiscount] = useState(0);
+
   // Persist Category
 
   const [selectedCategory, setSelectedCategory] = useState(() => {
@@ -161,10 +171,56 @@ function App() {
 
   const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
 
-  const totalAmount = cart.reduce(
+  const subtotal = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
+
+  const discountAmount = (subtotal * discount) / 100;
+
+  const totalAmount = subtotal - discountAmount;
+
+  // Auto Remove SAVE20
+
+  useEffect(() => {
+    if (subtotal < 1000 && couponCode.toLowerCase() === "save20") {
+      setDiscount(0);
+    }
+  }, [subtotal, couponCode]);
+
+  // Apply Coupon
+
+  const applyCoupon = () => {
+    const code = couponCode.toLowerCase();
+
+    // SAVE10
+
+    if (code === "save10") {
+      setDiscount(10);
+
+      alert("10% discount applied 🎉");
+    }
+
+    // SAVE20
+    else if (code === "save20") {
+      if (subtotal >= 1000) {
+        setDiscount(20);
+
+        alert("20% discount applied 🎉");
+      } else {
+        setDiscount(0);
+
+        alert("SAVE20 works only above ₹1000 order");
+      }
+    }
+
+    // Invalid Coupon
+    else {
+      setDiscount(0);
+
+      alert("Invalid coupon");
+    }
+  };
 
   // WhatsApp Order
 
@@ -204,6 +260,10 @@ ${address}
 ${orderItems}
 
 ------------------------
+
+Subtotal: ₹${subtotal}
+
+Discount: ₹${discountAmount}
 
 Total Amount: ₹${totalAmount}
 
@@ -260,6 +320,14 @@ Thank you 🚚`;
         <button onClick={() => setSelectedCategory("rice")}>Rice</button>
       </div>
 
+      {/* Offer Banner */}
+
+      <div className="offer-banner">
+        🎉 SAVE10 → 10% OFF
+        <br />
+        🔥 SAVE20 → 20% OFF above ₹1000
+      </div>
+
       {/* Products */}
 
       <div className="products-grid">
@@ -267,7 +335,11 @@ Thank you 🚚`;
           const cartItem = cart.find((item) => item.id === product.id);
 
           return (
-            <div className="product-card" key={product.id}>
+            <div
+              className="product-card"
+              key={product.id}
+              onClick={() => setSelectedProduct(product)}
+            >
               <img
                 src={product.image}
                 alt={product.name}
@@ -281,14 +353,25 @@ Thank you 🚚`;
               </div>
 
               {!cartItem ? (
-                <button className="add-btn" onClick={() => addToCart(product)}>
+                <button
+                  className="add-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+
+                    addToCart(product);
+                  }}
+                >
                   Add
                 </button>
               ) : (
                 <div className="qty-controls">
                   <button
                     className="qty-btn"
-                    onClick={() => decreaseQty(product.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      decreaseQty(product.id);
+                    }}
                   >
                     -
                   </button>
@@ -297,7 +380,11 @@ Thank you 🚚`;
 
                   <button
                     className="qty-btn"
-                    onClick={() => increaseQty(product.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      increaseQty(product.id);
+                    }}
                   >
                     +
                   </button>
@@ -312,8 +399,6 @@ Thank you 🚚`;
 
       <div className="cart-container">
         <h2>🛒 Cart Summary ({totalItems} items)</h2>
-
-        {/* Clear Cart Button */}
 
         {cart.length > 0 && (
           <button className="clear-cart-btn" onClick={clearCart}>
@@ -365,7 +450,29 @@ Thank you 🚚`;
               </div>
             ))}
 
+            {/* Coupon */}
+
+            <div className="coupon-section">
+              <input
+                type="text"
+                placeholder="Enter coupon code"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                className="coupon-input"
+              />
+
+              <button className="apply-btn" onClick={applyCoupon}>
+                Apply
+              </button>
+            </div>
+
+            {/* Totals */}
+
             <div className="cart-total">
+              <p>Subtotal: ₹{subtotal}</p>
+
+              <p>Discount: ₹{discountAmount}</p>
+
               <h2>Total Amount: ₹{totalAmount}</h2>
             </div>
           </>
@@ -404,6 +511,51 @@ Thank you 🚚`;
           Place Order on WhatsApp
         </button>
       </div>
+
+      {/* Product Popup */}
+
+      {selectedProduct && (
+        <div className="popup-overlay" onClick={() => setSelectedProduct(null)}>
+          <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+            {/* Close */}
+
+            <button
+              className="close-popup"
+              onClick={() => setSelectedProduct(null)}
+            >
+              ✕
+            </button>
+
+            {/* Image */}
+
+            <img
+              src={selectedProduct.image}
+              alt={selectedProduct.name}
+              className="popup-image"
+            />
+
+            {/* Details */}
+
+            <h2>{selectedProduct.name}</h2>
+
+            <p className="popup-price">₹{selectedProduct.price}</p>
+
+            <p className="popup-description">
+              Fresh premium quality {selectedProduct.name}
+              available for quick delivery.
+            </p>
+
+            {/* Add Button */}
+
+            <button
+              className="popup-add-btn"
+              onClick={() => addToCart(selectedProduct)}
+            >
+              Add To Cart
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
